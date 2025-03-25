@@ -1,4 +1,5 @@
-# Real-Time Streaming Pipeline: Coinbase → Kafka → Databricks → Delta → Power BI
+# Real-Time Streaming Pipeline:
+## Kafka → parsedDF → parsedDFwithTimestamp → withWatermark → windowedAgg → Delta Table → Power BI
 
 ## Overview
 This document outlines a real-time cryptocurrency streaming pipeline built using Coinbase's WebSocket API, Apache Kafka (via Azure Event Hubs), Azure Databricks, Delta Lake, and Power BI.
