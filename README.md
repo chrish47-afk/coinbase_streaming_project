@@ -1,5 +1,5 @@
-# Real-Time Streaming Pipeline:
-## Kafka → parsedDF → parsedDFwithTimestamp → withWatermark → windowedAgg → Delta Table → Power BI
+# Real-Time Streaming Pipeline:  
+##### Kafka → parsedDF → parsedDFwithTimestamp → withWatermark → windowedAgg → Delta Table → Power BI
 
 ## Overview
 This document outlines a real-time cryptocurrency streaming pipeline built using Coinbase's WebSocket API, Apache Kafka (via Azure Event Hubs), Azure Databricks, Delta Lake, and Power BI.
@@ -63,17 +63,6 @@ This document outlines a real-time cryptocurrency streaming pipeline built using
 
 ---
 
-## Streaming vs. Batch
-
-| Component                              | Mode                                               |
-|----------------------------------------|----------------------------------------------------|
-| WebSocket → Kafka                      | Streaming                                          |
-| Kafka → Databricks via readStream      | Streaming                                          |
-| Databricks → Delta Table (writeStream) | Streaming                                          |
-| Power BI → Delta Table                 | Pseudo-real-time (DirectQuery or scheduled refresh)|
-
----
-
 ## Real-Time Behavior
 
 ### Data is Real-Time If:
@@ -88,9 +77,6 @@ This document outlines a real-time cryptocurrency streaming pipeline built using
 | DirectQuery  | Queries SQL Warehouse live (1–5 min intervals) |
 
 ---
-
-## Tips & Best Practices
-
 ### Watermarking & Windowing in Databricks
 ```scala
 val parsedDF = rawDF
@@ -99,30 +85,88 @@ val parsedDF = rawDF
   .groupBy(window($"event_time", "1 minute"), $"product_id")
   .agg(avg($"price".cast("double")).alias("avg_price"))
 ```
+<details>
+<summary><strong>Some Watermarking Debugging</strong></summary>
 
-### Suggested Power BI Visuals
-- Line Chart: BTC/ETH/ADA price over time
-- KPI Cards: Current price, 24h volume
-- Table: Timestamped feed of recent updates
+# Understanding Spark Streaming Watermarks with Coinbase Data
+
+## Timestamp Types in Streaming
+
+### `time` (from Coinbase)
+```
+2025-03-25T08:13:54.778830Z
+```
+- This is the **event time** — when the price update actually happened on Coinbase.
+
+### `kafka_timestamp` (from Kafka ingestion)
+```
+2025-03-25T08:24:13.591Z
+```
+- This is the **processing time** — when the message was received by Azure Event Hub/Kafka.
+
+- This means the event arrived ~10 minutes after its actual creation time.
+
+---
+
+## Debugging Watermark Issues in Spark
+
+### Used a Debug Table to Inspect `event_time`
+If `.show()` fails on a streaming DataFrame, write to a Delta table:
+
+```scala
+parsedDFwithTimestamp.writeStream
+  .format("delta")
+  .option("checkpointLocation", "path/to/checkpoint")
+  .table("coinbase_debug_events")
+```
+
+Then query:
+```sql
+SELECT product_id, price, event_time, kafka_timestamp
+FROM coinbase_debug_events
+ORDER BY event_time DESC
+```
+
+---
+
+## Common Pitfall: Null `event_time`
+
+If `event_time` is null, the format is likely incorrect.
+
+### Confirm Format for Coinbase
+Given the timestamp:
+```
+2025-03-25T09:35:36.522473Z
+```
+Use:
+```scala
+.withColumn("event_time", to_timestamp($"time", "yyyy-MM-dd'T'HH:mm:ss.SSSSSSX"))
+```
+- `SSSSSS` handles microseconds
+- `X` handles the `Z` (UTC)
+
+Once fixed, `event_time` will parse correctly → watermark logic will work → Spark will emit results.
 
 ---
 
 ## Summary
-I have built a fully functioning **real-time data pipeline** that:
+
+- `event_time` must be parsed correctly (microsecond + timezone aware)
+- Kafka ingestion time is not used for watermarking
+- If events arrive > watermark duration late, Spark silently drops them
+- Use `.writeStream` to Delta tables to debug streaming pipelines
+
+</details>
+
+---
+
+## Summary
+I have built a functioning **real-time data pipeline** that:
 - Streams from Coinbase → Kafka → Databricks
 - Stores & transforms with Delta Lake
 - Visualizes in Power BI in near real time
 
-It’s scalable, modular, and production-grade with the ability to add more coins, windowed aggregations, alerting, or historical analysis.
-
 ---
-
-Let us know if you'd like to:
-- Add alerting (price spikes, volatility)
-- Store historical Delta snapshots
-- Connect multiple exchanges (Binance, etc.)
-
-
 <details>
 <summary><strong>Power BI Integration: Databricks SQL Endpoint</strong></summary>
 
