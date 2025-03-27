@@ -160,6 +160,10 @@ Once fixed, `event_time` will parse correctly → watermark logic will work → 
 
 ---
 
+[Power BI Dashboard](https://app.powerbi.com/view?r=eyJrIjoiNmUxYmU1OGQtOGI1Mi00YTYwLWJkOGYtMTFhMGU1OTk2YmEwIiwidCI6ImY2YjZkZDViLWYwMmYtNDQxYS05OWEwLTE2MmFjNTA2MGJkMiIsImMiOjZ9)
+
+---
+
 ## Summary
 I have built a functioning **real-time data pipeline** that:
 - Streams from Coinbase → Kafka → Databricks
@@ -215,5 +219,11 @@ I have built a functioning **real-time data pipeline** that:
 
 ---
 
+## Challenge and Next Steps:
+
+
+---
+
 ## References
 - [Coinbase WebSocket Authentication Documentation](https://docs.cdp.coinbase.com/exchange/docs/websocket-auth)
+- [Azure Databricks Notebook](https://adb-1486736798722567.7.azuredatabricks.net/editor/notebooks/2128876143842440?o=1486736798722567#command/6279586231880196)
