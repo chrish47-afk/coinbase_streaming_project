@@ -62,21 +62,6 @@ This document outlines a real-time cryptocurrency streaming pipeline built using
 - Displays real-time or near-real-time dashboards
 
 ---
-
-## Real-Time Behavior
-
-### Data is Real-Time If:
-- Python producer is running
-- Databricks `writeStream` is running
-- Power BI uses **DirectQuery** or **frequent refresh**
-
-### Power BI Notes:
-| Mode         | Behavior                                       |
-|--------------|------------------------------------------------|
-| Import       | Refreshes manually/scheduled                   |
-| DirectQuery  | Queries SQL Warehouse live (1–5 min intervals) |
-
----
 ### Watermarking & Windowing in Databricks
 ```scala
 val parsedDF = rawDF
@@ -172,7 +157,7 @@ I have built a functioning **real-time data pipeline** that:
 
 ---
 <details>
-<summary><strong>Power BI Integration: Databricks SQL Endpoint</strong></summary>
+<summary><strong>Power BI Integration Instructions: Databricks SQL Endpoint</strong></summary>
 
 # Step-by-Step: Databricks SQL Endpoint + Power BI
 
@@ -219,8 +204,19 @@ I have built a functioning **real-time data pipeline** that:
 
 ---
 
-## Challenge and Next Steps:
+## Challenges and Lessons Learned
 
+- API Struggles: Wasted time on Blockchain and Binance APIs due to permission errors.
+- Time Limitations: Needed more time for deeper exploration and improvements.
+- Cluster Slowness: Occasional VM timeouts and Spark cluster lag.
+- Power BI Formatting Issues: Difficulty adapting and formatting data in Power BI.
+
+## Next Steps and Future Enhancements
+
+- Explore Coinbase Data Deeper: Vet and analyze more streaming data.
+- Improve Watermarking & Aggregations: Optimize thresholds and intervals.
+- Enhance Power BI Dashboard: Refine visuals and integrate better analytics.
+- Set Clearer Goals: Define objectives and metrics at project start.
 
 ---
 
