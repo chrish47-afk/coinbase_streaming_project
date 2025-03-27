@@ -43,7 +43,7 @@ This document outlines a real-time cryptocurrency streaming pipeline built using
 - Subscribes to live `ticker` updates for: `BTC-USD`, `ETH-USD`, `ADA-USD`
 - Real-time JSON payload with fields like `price`, `product_id`, `time`
 
-### 2. **Python Kafka Producer**
+### 2. ** Kafka Producer**
 - Sends each WebSocket message to Azure Kafka (Event Hub)
 - Topic: `chrish47`
 
@@ -51,15 +51,16 @@ This document outlines a real-time cryptocurrency streaming pipeline built using
 - Reads from Kafka via `readStream`
 - Parses JSON and converts `time` to `TimestampType`
 - Applies watermark and windowed aggregations (as needed)
-- Writes stream to a Delta Lake table (e.g., `coinbase_ticker_table`)
+- Writes stream to a Delta Lake table (e.g., `coinbase_ticker_table`) for Vetting Purposes
+- Write stream to a Delta Lake Table (e.g., `coinbase_agg_table`) to use for PowerBI Dashboard
 
 ### 4. **Delta Table**
 - Persistent store of real-time stream
 - Format: Delta Lake (can be queried by SQL engines and Power BI)
 
 ### 5. **Power BI**
-- Connects to Databricks SQL Endpoint or Synapse to read Delta tables
-- Displays real-time or near-real-time dashboards
+- Connects to Azure Databricks SQL Endpoint (via a SQL warehouse) or Synapse to read Delta tables
+- Displays real-time or near-real-time dashboards. Refreshing as needed.
 
 ---
 ### Watermarking & Windowing in Databricks
@@ -208,6 +209,7 @@ I have built a functioning **real-time data pipeline** that:
 
 - API Struggles: Wasted time on Blockchain and Binance APIs due to permission errors.
 - Time Limitations: Needed more time for deeper exploration and improvements.
+- Watermarking: I particularly had a hard time managing the integrated Watermark
 - Cluster Slowness: Occasional VM timeouts and Spark cluster lag.
 - Power BI Formatting Issues: Difficulty adapting and formatting data in Power BI.
 
