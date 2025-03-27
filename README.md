@@ -43,7 +43,7 @@ This document outlines a real-time cryptocurrency streaming pipeline built using
 - Subscribes to live `ticker` updates for: `BTC-USD`, `ETH-USD`, `ADA-USD`
 - Real-time JSON payload with fields like `price`, `product_id`, `time`
 
-### 2. ** Kafka Producer**
+### 2. **Kafka Producer**
 - Sends each WebSocket message to Azure Kafka (Event Hub)
 - Topic: `chrish47`
 
