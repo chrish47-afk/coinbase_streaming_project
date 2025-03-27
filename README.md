@@ -1,5 +1,5 @@
 # Real-Time Streaming Pipeline:  
-##### Kafka → parsedDF → parsedDFwithTimestamp → withWatermark → windowedAgg → Delta Table → Power BI
+###### Coinbase Extraction (Python) → Kafka → parsedDF → parsedDFwithTimestamp → withWatermark → windowedAgg → Delta Table → Power BI
 
 ## Overview
 This document outlines a real-time cryptocurrency streaming pipeline built using Coinbase's WebSocket API, Apache Kafka (via Azure Event Hubs), Azure Databricks, Delta Lake, and Power BI.
@@ -9,30 +9,30 @@ This document outlines a real-time cryptocurrency streaming pipeline built using
 ## Architecture Workflow
 
 ```
-           +------------------+
-           |  Coinbase WS API |
-           +------------------+
+           +---------------------------+
+           |  Coinbase WS API (Python) |
+           +---------------------------+
                     ↓
-         +---------------------+
-         | Python Kafka Producer|
-         +---------------------+
+            +---------------------+
+            | Kafka Producer      |
+            +---------------------+
                     ↓
-      +----------------------------+
-      | Azure Event Hub / Kafka    |
-      +----------------------------+
+         +----------------------------+
+         | Azure Event Hub / Kafka    |
+         +----------------------------+
                     ↓
-      +-----------------------------+
-      | Azure Databricks readStream |
-      | + Parse + Watermark + Agg   |
-      +-----------------------------+
+         +-----------------------------+
+         | Azure Databricks readStream |
+         | + Parse + Watermark + Agg   |
+         +-----------------------------+
                     ↓
-      +-----------------------+
-      | Delta Lake Table      |
-      +-----------------------+
+         +-----------------------+
+         | Delta Lake Table      |
+         +-----------------------+
                     ↓
-      +-----------------------+
-      | Power BI Dashboard    |
-      +-----------------------+
+         +-----------------------+
+         | Power BI Dashboard    |
+         +-----------------------+
 ```
 
 ---
