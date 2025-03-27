@@ -65,11 +65,25 @@ This document outlines a real-time cryptocurrency streaming pipeline built using
 ---
 ### Watermarking & Windowing in Databricks
 ```scala
-val parsedDF = rawDF
-  .withColumn("event_time", to_timestamp($"time", "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"))
-  .withWatermark("event_time", "10 minutes")
-  .groupBy(window($"event_time", "1 minute"), $"product_id")
+// Step 1: Convert the 'time' column to a timestamp
+val parsedDFwithTimestamp = parsedDF
+//  .withColumn("event_time", to_timestamp($"time", "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"))
+  .withColumn("event_time", to_timestamp($"time", "yyyy-MM-dd'T'HH:mm:ss.SSSSSSX"))
+
+// Step 2: Add 60-minute watermark
+val withWatermark = parsedDFwithTimestamp
+  .withWatermark("event_time", "60 minutes")
+
+// Step 3: Group by 2-minute windows
+val windowedAgg = withWatermark
+  .groupBy(window($"event_time", "2 minute"), $"product_id") //Split stream into fixed-size time chunks
   .agg(avg($"price".cast("double")).alias("avg_price"))
+  .select(
+    $"product_id",
+    $"window.start".alias("window_start"),
+    $"window.end".alias("window_end"),
+    $"avg_price"
+  )
 ```
 <details>
 <summary><strong>Some Watermarking Debugging</strong></summary>
